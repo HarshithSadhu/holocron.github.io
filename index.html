@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holocron — Software Engineer Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+  :root {
+    --bg: #0a0a0b;
+    --surface: #111113;
+    --surface2: #18181c;
+    --border: #2a2a30;
+    --border-light: #3a3a42;
+    --accent: #c8f23a;
+    --accent-dim: rgba(200,242,58,0.12);
+    --accent-glow: rgba(200,242,58,0.06);
+    --text: #e8e8ec;
+    --text-dim: #888892;
+    --text-muted: #55555f;
+    --danger: #ff4d4d;
+    --warning: #f59e0b;
+    --blue: #4da6ff;
+    --purple: #a78bfa;
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── INTRO SCREEN ─────────────────────── */
+  #intro-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #intro-screen::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,242,58,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .intro-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .intro-title {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    text-align: center;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  .intro-title span { color: var(--accent); }
+
+  .intro-sub {
+    font-family: var(--body);
+    font-size: 16px;
+    color: var(--text-dim);
+    text-align: center;
+    max-width: 460px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  .intro-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    max-width: 520px;
+    width: 100%;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+  }
+
+  .intro-meta-item {
+    background: var(--surface);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .intro-meta-item .val {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+  }
+
+  .intro-meta-item .lbl {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: block;
+  }
+
+  .intro-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 520px;
+    width: 100%;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.0s forwards;
+  }
+
+  .intro-module-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .intro-module-row .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 20px;
+  }
+
+  .intro-module-row .mod-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .intro-module-row .mod-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .intro-module-row .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .intro-notice {
+    max-width: 520px;
+    width: 100%;
+    border-left: 2px solid var(--border-light);
+    padding: 12px 16px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.2s forwards;
+  }
+
+  .intro-notice p {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .intro-notice strong { color: var(--text); font-weight: 500; }
+
+  .btn-start {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 16px 48px;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.4s forwards;
+  }
+
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,242,58,0.25); }
+
+  /* ─── MAIN LAYOUT ────────────────────── */
+  #assessment {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    height: 52px;
+    gap: 24px;
+  }
+
+  .topbar-logo {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  .topbar-progress {
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .progress-seg {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .progress-seg.done { background: var(--accent); }
+  .progress-seg.active { background: rgba(200,242,58,0.5); }
+
+  .topbar-timer {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .topbar-timer.warn { color: var(--danger); }
+
+  .topbar-module {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+    display: none;
+  }
+
+  /* ─── MODULE WRAPPER ────────────────── */
+  .module-wrap {
+    display: none;
+    flex: 1;
+    padding: 32px 24px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .module-wrap.active { display: block; }
+
+  .module-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .module-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .module-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(200,242,58,0.3);
+    padding: 2px 8px;
+  }
+
+  .module-title {
+    font-family: var(--display);
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .module-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 640px;
+    line-height: 1.7;
+  }
+
+  /* ─── SHARED COMPONENTS ──────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .card p { font-size: 13px; line-height: 1.7; color: var(--text-dim); }
+
+  .prompt-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+
+  .prompt-box p { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 14px 16px;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--border-light); }
+  textarea::placeholder { color: var(--text-muted); }
+
+  .btn-primary {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 12px 32px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 24px;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,242,58,0.2); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--border-light); color: var(--text); }
+
+  /* ─── SCORE TRACKER (hidden live) ─────── */
+  .score-tracker {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    z-index: 200;
+    opacity: 0.7;
+  }
+
+  .score-tracker .st-row { display: flex; gap: 8px; align-items: center; }
+  .score-tracker .st-label { color: var(--text-muted); }
+  .score-tracker .st-val { color: var(--accent); }
+
+  /* ─── MODULE 1: SYSTEM DESIGN ─────────── */
+  .arch-canvas {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    min-height: 320px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+    user-select: none;
+  }
+
+  .arch-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
+  }
+
+  .component-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .comp-chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  .comp-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .comp-chip.placed { opacity: 0.4; }
+
+  .arch-component {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    cursor: move;
+    transition: border-color 0.15s;
+    min-width: 110px;
+    text-align: center;
+    letter-spacing: 0.03em;
+    z-index: 10;
+  }
+
+  .arch-component:hover, .arch-component.dragging { border-color: var(--accent); z-index: 20; }
+  .arch-component .comp-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+
+  .scoring-signal {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .scoring-signal .sig-name { font-size: 12px; color: var(--text-dim); }
+  .scoring-signal .sig-val { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+
+  /* ─── MODULE 2: DEBUGGING ─────────────── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .code-block .line { display: flex; gap: 16px; }
+  .code-block .ln { color: var(--text-muted); min-width: 24px; text-align: right; font-size: 11px; padding-top: 1px; }
+  .code-block .code { color: #e6edf3; }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .fn { color: #d2a8ff; }
+  .code-block .str { color: #a5d6ff; }
+  .code-block .cm { color: #6e7681; font-style: italic; }
+  .code-block .num { color: #79c0ff; }
+
+  .edge-case-cards { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+
+  .edge-case {
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+
+  .edge-case.revealed { opacity: 1; transform: translateY(0); }
+  .edge-case.addressed { border-color: rgba(200,242,58,0.4); background: var(--accent-glow); }
+
+  .edge-case .ec-icon { font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+  .edge-case .ec-title { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 2px; letter-spacing: 0.04em; }
+  .edge-case .ec-desc { font-size: 12px; color: var(--text-dim); }
+  .edge-case .ec-status { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+  .edge-case.addressed .ec-status { color: var(--accent); }
+
+  /* AI Chat */
+  .ai-chat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 220px;
+  }
+
+  .ai-chat-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-msg { font-size: 12px; line-height: 1.6; }
+  .ai-msg.user { color: var(--text-dim); padding-left: 12px; border-left: 2px solid var(--border); }
+  .ai-msg.assistant { color: var(--text); }
+  .ai-msg .msg-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+
+  .ai-input-row {
+    display: flex;
+    border-top: 1px solid var(--border);
+  }
+
+  .ai-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    font-family: var(--body);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .ai-input::placeholder { color: var(--text-muted); }
+
+  .ai-send {
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .ai-send:hover { background: var(--accent-dim); }
+
+  /* ─── MODULE 3: OUTAGE ─────────────────── */
+  .alert-banner {
+    background: rgba(255,77,77,0.08);
+    border: 1px solid rgba(255,77,77,0.3);
+    border-left: 3px solid var(--danger);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .alert-banner .alert-icon { font-size: 18px; }
+  .alert-banner .alert-text { font-size: 13px; line-height: 1.5; }
+  .alert-banner .alert-text strong { color: var(--danger); font-weight: 600; }
+  .alert-banner .alert-time { font-family: var(--mono); font-size: 11px; color: var(--danger); margin-left: auto; flex-shrink: 0; }
+
+  .investigation-tools {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .inv-tool {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .inv-tool:hover { border-color: var(--border-light); }
+  .inv-tool.opened { border-color: rgba(200,242,58,0.4); }
+  .inv-tool.opened::after { content: '✓'; position: absolute; top: 8px; right: 10px; font-size: 10px; color: var(--accent); font-family: var(--mono); }
+
+  .inv-tool .tool-icon { font-size: 20px; margin-bottom: 6px; }
+  .inv-tool .tool-name { font-family: var(--mono); font-size: 11px; color: var(--text); letter-spacing: 0.04em; margin-bottom: 3px; }
+  .inv-tool .tool-hint { font-size: 11px; color: var(--text-muted); }
+
+  .tool-panel {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .tool-panel.active { display: block; }
+  .tool-panel .panel-title { color: var(--text-muted); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .tool-panel .log-line { display: flex; gap: 12px; padding: 3px 0; border-bottom: 1px solid rgba(42,42,48,0.5); }
+  .tool-panel .log-time { color: var(--text-muted); min-width: 80px; }
+  .tool-panel .log-level { min-width: 50px; }
+  .tool-panel .log-level.error { color: var(--danger); }
+  .tool-panel .log-level.warn { color: var(--warning); }
+  .tool-panel .log-level.info { color: var(--blue); }
+  .tool-panel .log-msg { color: var(--text-dim); }
+  .tool-panel .highlight { color: var(--accent); }
+  .tool-panel .clue { color: var(--warning); }
+
+  /* ─── MODULE 4: COMMS ─────────────────── */
+  .rubric-live {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .rubric-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+
+  .rubric-item.met { border-color: rgba(200,242,58,0.3); background: var(--accent-glow); }
+
+  .rubric-check {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+  }
+
+  .rubric-item.met .rubric-check { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .rubric-label { font-size: 12px; color: var(--text-dim); }
+  .rubric-item.met .rubric-label { color: var(--text); }
+
+  .word-counter { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+  /* ─── MODULE 5: DOCS ─────────────────── */
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 16px;
+    min-height: 360px;
+  }
+
+  .docs-sidebar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    overflow-y: auto;
+  }
+
+  .docs-sidebar-title {
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .doc-nav-item {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.15s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .doc-nav-item:hover { background: var(--surface); color: var(--text); }
+  .doc-nav-item.viewed { color: var(--text); }
+  .doc-nav-item.viewed::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); }
+  .doc-nav-item .visit-count { font-family: var(--mono); font-size: 10px; color: var(--accent); }
+
+  .docs-content {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 360px;
+  }
+
+  .docs-content h3 { font-family: var(--display); font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .docs-content p { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 10px; }
+  .docs-content code { font-family: var(--mono); font-size: 12px; background: var(--surface); padding: 2px 6px; border: 1px solid var(--border); color: var(--accent); }
+  .docs-content ul { padding-left: 18px; margin-bottom: 10px; }
+  .docs-content li { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 4px; }
+  .docs-content .doc-note { background: rgba(200,242,58,0.06); border-left: 2px solid var(--accent); padding: 10px 12px; margin: 12px 0; font-size: 12px; color: var(--text-dim); }
+
+  /* ─── MODULE 6: SLACK ─────────────────── */
+  .slack-header {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .slack-channel { color: var(--accent); font-size: 13px; }
+
+  .slack-thread {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 380px;
+    overflow-y: auto;
+  }
+
+  .slack-msg { display: flex; gap: 12px; }
+  .slack-avatar { width: 32px; height: 32px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-family: var(--display); }
+  .slack-msg-body {}
+  .slack-msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+  .slack-name { font-size: 13px; font-weight: 600; }
+  .slack-time { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+  .slack-role { font-family: var(--mono); font-size: 10px; padding: 1px 6px; border-radius: 2px; }
+  .slack-role.senior { background: rgba(77,166,255,0.15); color: var(--blue); }
+  .slack-role.junior { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .slack-role.pm { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .slack-msg-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .slack-msg-text .mention { color: var(--blue); }
+  .slack-msg-text .code-inline { font-family: var(--mono); font-size: 11px; background: var(--surface); padding: 1px 5px; border-radius: 2px; }
+  .slack-msg-text .reaction { background: var(--surface); border: 1px solid var(--border); padding: 2px 6px; border-radius: 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; }
+
+  .slack-signal-flags {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .signal-flag {
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    position: relative;
+  }
+
+  .signal-flag .sf-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
+  .signal-flag .sf-desc { font-size: 11px; color: var(--text-dim); }
+
+  /* ─── MODULE 7: VALUES ─────────────────── */
+  .scenario-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .scenario-num { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+  .scenario-text { font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+  .scenario-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .scenario-tag { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border: 1px solid var(--border); color: var(--text-muted); }
+
+  .orientation-meter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .orient-col { text-align: center; }
+  .orient-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
+  .orient-bar { height: 4px; background: var(--border); position: relative; }
+  .orient-fill { height: 100%; background: var(--accent); width: 0; transition: width 0.5s ease; }
+
+  /* ─── RESULTS SCREEN ──────────────────── */
+  #results-screen {
+    display: none;
+    padding: 48px 24px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .results-header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .results-candidate { flex: 1; }
+  .results-name { font-family: var(--display); font-size: 28px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.02em; }
+  .results-meta { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+
+  .verdict-badge {
+    padding: 12px 20px;
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .verdict-badge.recommend { background: rgba(200,242,58,0.15); border: 1px solid var(--accent); color: var(--accent); }
+  .verdict-badge.consider { background: rgba(245,158,11,0.1); border: 1px solid var(--warning); color: var(--warning); }
+  .verdict-badge.pass { background: rgba(255,77,77,0.1); border: 1px solid var(--danger); color: var(--danger); }
+
+  .module-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .module-score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ms-score-ring {
+    width: 44px; height: 44px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .ms-score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .ms-score-ring .score-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 500; }
+
+  .ms-info { flex: 1; }
+  .ms-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .ms-signals { font-size: 11px; color: var(--text-muted); }
+
+  .dimensions-section { margin-bottom: 32px; }
+  .section-title { font-family: var(--display); font-size: 18px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em; }
+
+  .dim-rows { display: flex; flex-direction: column; gap: 6px; }
+
+  .dim-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 70px;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .dim-name { font-size: 12px; color: var(--text-dim); }
+  .dim-bar-wrap { position: relative; height: 6px; background: var(--border); }
+  .dim-bar-fill { height: 100%; background: var(--accent); transition: width 0.8s ease; }
+  .dim-bar-target { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-muted); }
+
+  .dim-scores { font-family: var(--mono); font-size: 11px; text-align: right; }
+  .dim-scores .candidate-score { color: var(--text); }
+  .dim-scores .gap { font-size: 10px; }
+  .dim-scores .gap.positive { color: var(--accent); }
+  .dim-scores .gap.negative { color: var(--danger); }
+  .dim-scores .gap.neutral { color: var(--text-muted); }
+
+  .scoring-methodology {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .scoring-methodology h3 { font-family: var(--display); font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+  .scoring-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .scoring-table th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .scoring-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-dim); vertical-align: top; line-height: 1.5; }
+  .scoring-table td:first-child { color: var(--text); font-weight: 500; }
+  .scoring-table tr:last-child td { border-bottom: none; }
+  .scoring-table .score-pill { font-family: var(--mono); font-size: 10px; background: var(--accent-dim); color: var(--accent); padding: 1px 6px; border-radius: 2px; white-space: nowrap; }
+
+  .fit-score-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .fit-score-block .fit-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .fit-score-block .fit-number { font-family: var(--display); font-size: 64px; font-weight: 800; color: var(--accent); line-height: 1; letter-spacing: -0.04em; }
+  .fit-score-block .fit-sub { font-size: 13px; color: var(--text-dim); margin-top: 8px; }
+
+  /* ─── ANIMATIONS ──────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface2); }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 600px) { .two-col { grid-template-columns: 1fr; } .investigation-tools { grid-template-columns: repeat(2,1fr); } .module-scores-grid { grid-template-columns: 1fr; } .dim-row { grid-template-columns: 140px 1fr 60px; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ INTRO ═══ -->
+<div id="intro-screen">
+  <div class="intro-badge">Holocron · Assessment Platform</div>
+  <h1 class="intro-title">Software Engineer<br><span>Assessment</span></h1>
+  <p class="intro-sub">A 7-module evaluation designed to measure what actually matters in the age of AI — judgment, communication, and how you think.</p>
+
+  <div class="intro-meta">
+    <div class="intro-meta-item"><span class="val">7</span><span class="lbl">Modules</span></div>
+    <div class="intro-meta-item"><span class="val">105m</span><span class="lbl">Duration</span></div>
+    <div class="intro-meta-item"><span class="val">13</span><span class="lbl">Dimensions</span></div>
+  </div>
+
+  <div class="intro-modules">
+    <div class="intro-module-row"><span class="num">01</span><span class="mod-name">System Design</span><span class="dot"></span><span class="mod-tag">Systems Thinking</span></div>
+    <div class="intro-module-row"><span class="num">02</span><span class="mod-name">Debugging with AI</span><span class="dot"></span><span class="mod-tag">AI Collaboration</span></div>
+    <div class="intro-module-row"><span class="num">03</span><span class="mod-name">Outage Investigation</span><span class="dot"></span><span class="mod-tag">Problem Discovery</span></div>
+    <div class="intro-module-row"><span class="num">04</span><span class="mod-name">Incident Communication</span><span class="dot"></span><span class="mod-tag">Written Comms</span></div>
+    <div class="intro-module-row"><span class="num">05</span><span class="mod-name">Feature Build from Docs</span><span class="dot"></span><span class="mod-tag">Research & Autonomy</span></div>
+    <div class="intro-module-row"><span class="num">06</span><span class="mod-name">Collaborative Judgment</span><span class="dot"></span><span class="mod-tag">Team Dynamics</span></div>
+    <div class="intro-module-row"><span class="num">07</span><span class="mod-name">Values & Tradeoffs</span><span class="dot"></span><span class="mod-tag">Judgment</span></div>
+  </div>
+
+  <div class="intro-notice">
+    <p><strong>Note on tracking:</strong> Behavioral signals — click order, time spent, revision patterns, note-taking — are captured passively throughout. You are informed they are active; you are not told which specific signals are being observed. This is intentional.</p>
+  </div>
+
+  <button class="btn-start" onclick="startAssessment()">Begin Assessment →</button>
+</div>
+
+<!-- ═══════════════════════════════════════ MAIN ═══ -->
+<div id="assessment">
+
+  <div class="topbar">
+    <div class="topbar-logo">HOLOCRON</div>
+    <div class="topbar-progress" id="progress-bar">
+      <div class="progress-seg active" data-seg="0"></div>
+      <div class="progress-seg" data-seg="1"></div>
+      <div class="progress-seg" data-seg="2"></div>
+      <div class="progress-seg" data-seg="3"></div>
+      <div class="progress-seg" data-seg="4"></div>
+      <div class="progress-seg" data-seg="5"></div>
+      <div class="progress-seg" data-seg="6"></div>
+    </div>
+    <div class="topbar-timer" id="timer">1:45:00</div>
+  </div>
+
+  <!-- ── MODULE 1: SYSTEM DESIGN ── -->
+  <div class="module-wrap active" id="mod-1">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 01 / 07</span>
+        <span class="module-tag">Systems Thinking</span>
+      </div>
+      <h2 class="module-title">System Design</h2>
+      <p class="module-desc">Design the backend architecture for a real-time ride-sharing dispatch system. We track decision order, what you add first, what you revise, and what you never think to include.</p>
+    </div>
+
+    <div class="prompt-box">
+      <p><strong>Scenario:</strong> Design the backend architecture for a real-time ride-sharing dispatch system. Requirements: 10,000 concurrent users, sub-500ms driver matching SLA, geo-distributed across 3 regions. Budget is constrained — you cannot run everything.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Component Palette — drag components onto the canvas</div>
+      <div class="component-palette" id="palette">
+        <div class="comp-chip" data-comp="API Gateway" onclick="addComponent(this,'API Gateway','🌐')">API Gateway</div>
+        <div class="comp-chip" data-comp="Load Balancer" onclick="addComponent(this,'Load Balancer','⚖️')">Load Balancer</div>
+        <div class="comp-chip" data-comp="Matching Service" onclick="addComponent(this,'Matching Service','🔀')">Matching Service</div>
+        <div class="comp-chip" data-comp="Location Service" onclick="addComponent(this,'Location Service','📍')">Location Service</div>
+        <div class="comp-chip" data-comp="Message Queue" onclick="addComponent(this,'Message Queue','📨')">Message Queue</div>
+        <div class="comp-chip" data-comp="Rate Limiter" onclick="addComponent(this,'Rate Limiter','🛡️')">Rate Limiter</div>
+        <div class="comp-chip" data-comp="Cache (Redis)" onclick="addComponent(this,'Cache (Redis)','⚡')">Cache (Redis)</div>
+        <div class="comp-chip" data-comp="Primary DB" onclick="addComponent(this,'Primary DB','🗄️')">Primary DB</div>
+        <div class="comp-chip" data-comp="CDN" onclick="addComponent(this,'CDN','🌍')">CDN</div>
+        <div class="comp-chip" data-comp="Auth Service" onclick="addComponent(this,'Auth Service','🔑')">Auth Service</div>
+        <div class="comp-chip" data-comp="Monitoring" onclick="addComponent(this,'Monitoring','📊')">Monitoring</div>
+        <div class="comp-chip" data-comp="Circuit Breaker" onclick="addComponent(this,'Circuit Breaker','⚡')">Circuit Breaker</div>
+        <div class="comp-chip" data-comp="WebSocket Server" onclick="addComponent(this,'WebSocket Server','🔌')">WebSocket Server</div>
+        <div class="comp-chip" data-comp="Geo DB" onclick="addComponent(this,'Geo DB','🗺️')">Geo DB</div>
+      </div>
+      <div class="arch-canvas" id="arch-canvas">
+        <div class="arch-grid"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;" id="canvas-hint">
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">Click components above to add them here</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="card-title">Live Behavioral Signals</div>
+          <div id="arch-signals">
+            <div class="scoring-signal"><span class="sig-name">Components placed</span><span class="sig-val" id="comp-count">0</span></div>
+            <div class="scoring-signal"><span class="sig-name">Rate limiter added?</span><span class="sig-val" id="rl-status">—</span></div>
+            <div class="scoring-signal"><span class="sig-name">Monitoring added?</span><span class="sig-val" id="mon-status">—</span></div>
+            <div class="scoring-signal"><span class="sig-name">Circuit breaker?</span><span class="sig-val" id="cb-status">—</span></div>
+            <div class="scoring-signal"><span class="sig-name">Time first component</span><span class="sig-val" id="first-time">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="field-label" style="margin-top:0">Document your key tradeoffs</span>
+        <textarea id="tradeoffs-text" rows="5" placeholder="What tradeoffs did you make? What would you sacrifice first under budget pressure? What are the risks of your design?" oninput="trackTradeoffs()"></textarea>
+        <div class="word-counter" id="tradeoffs-wc">0 words</div>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn-primary" onclick="nextModule(1)" id="btn-mod1">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 2: DEBUGGING ── -->
+  <div class="module-wrap" id="mod-2">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 02 / 07</span>
+        <span class="module-tag">AI Collaboration</span>
+      </div>
+      <h2 class="module-title">Debugging with AI</h2>
+      <p class="module-desc">A buggy function is below. An AI assistant is available. Fix it. Four hidden edge cases may reveal themselves as you work.</p>
+    </div>
+
+    <div class="prompt-box">
+      <p><strong>Bug report:</strong> The <code style="font-family:var(--mono);font-size:13px;color:var(--accent)">process_orders</code> function is causing intermittent production failures. Some orders are being processed, others silently fail. Fix it.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="line"><span class="ln">1</span><span class="code"><span class="kw">import</span> requests, <span class="kw">time</span></span></div>
+      <div class="line"><span class="ln">2</span><span class="code"></span></div>
+      <div class="line"><span class="ln">3</span><span class="code"><span class="kw">def</span> <span class="fn">process_orders</span>(orders, timeout=<span class="num">30</span>):</span></div>
+      <div class="line"><span class="ln">4</span><span class="code">    results = []</span></div>
+      <div class="line"><span class="ln">5</span><span class="code">    <span class="kw">for</span> order <span class="kw">in</span> orders:</span></div>
+      <div class="line"><span class="ln">6</span><span class="code">        <span class="kw">try</span>:</span></div>
+      <div class="line"><span class="ln">7</span><span class="code">            response = requests.post(</span></div>
+      <div class="line"><span class="ln">8</span><span class="code">                <span class="str">'https://api.payments.internal/charge'</span>,</span></div>
+      <div class="line"><span class="ln">9</span><span class="code">                json={<span class="str">'order_id'</span>: order[<span class="str">'id'</span>], <span class="str">'amount'</span>: order[<span class="str">'total'</span>]}</span></div>
+      <div class="line"><span class="ln">10</span><span class="code">            )</span></div>
+      <div class="line"><span class="ln">11</span><span class="code">            <span class="kw">if</span> response.status_code == <span class="num">200</span>:</span></div>
+      <div class="line"><span class="ln">12</span><span class="code">                results.append({<span class="str">'order_id'</span>: order[<span class="str">'id'</span>], <span class="str">'status'</span>: <span class="str">'success'</span>})</span></div>
+      <div class="line"><span class="ln">13</span><span class="code">        <span class="kw">except</span> Exception <span class="kw">as</span> e:</span></div>
+      <div class="line"><span class="ln">14</span><span class="code">            <span class="kw">pass</span> <span class="cm"># silently ignore errors</span></div>
+      <div class="line"><span class="ln">15</span><span class="code">    <span class="kw">return</span> results</span></div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <span class="field-label" style="margin-top:0">Your fix</span>
+        <textarea id="debug-answer" rows="12" placeholder="Write your corrected function here..." oninput="trackDebug(this.value)" style="font-family:var(--mono);font-size:12px;"></textarea>
+
+        <div class="edge-case-cards" id="edge-cases">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Edge Cases — Reveal as you work</div>
+          <div class="edge-case" id="ec-1">
+            <span class="ec-icon">⏱️</span>
+            <div><div class="ec-title">UNUSED TIMEOUT</div><div class="ec-desc">The <code style="font-family:var(--mono);font-size:11px">timeout=30</code> parameter is never passed to the requests call. Slow payment APIs will hang indefinitely.</div></div>
+            <span class="ec-status" id="ec-1-status">Unaddressed</span>
+          </div>
+          <div class="edge-case" id="ec-2">
+            <span class="ec-icon">📭</span>
+            <div><div class="ec-title">EMPTY INPUT</div><div class="ec-desc">What happens if <code style="font-family:var(--mono);font-size:11px">orders=[]</code>? Callers may not handle an empty results list gracefully.</div></div>
+            <span class="ec-status" id="ec-2-status">Unaddressed</span>
+          </div>
+          <div class="edge-case" id="ec-3">
+            <span class="ec-icon">🔑</span>
+            <div><div class="ec-title">MISSING KEYS</div><div class="ec-desc">If any order lacks <code style="font-family:var(--mono);font-size:11px">'id'</code> or <code style="font-family:var(--mono);font-size:11px">'total'</code>, a <code style="font-family:var(--mono);font-size:11px">KeyError</code> is silently swallowed. Malformed orders disappear.</div></div>
+            <span class="ec-status" id="ec-3-status">Unaddressed</span>
+          </div>
+          <div class="edge-case" id="ec-4">
+            <span class="ec-icon">⚛️</span>
+            <div><div class="ec-title">PARTIAL FAILURE</div><div class="ec-desc">If order 3 of 5 fails, orders 1–2 have already been charged. No atomicity, no rollback. Caller has no way to know which succeeded.</div></div>
+            <span class="ec-status" id="ec-4-status">Unaddressed</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ai-chat">
+          <div class="ai-chat-header"><div class="ai-dot"></div>AI ASSISTANT — AVAILABLE</div>
+          <div class="ai-messages" id="ai-messages">
+            <div class="ai-msg assistant"><div class="msg-label">AI</div>I can help you debug this function. What would you like to explore?</div>
+          </div>
+          <div class="ai-input-row">
+            <input class="ai-input" id="ai-input" placeholder="Ask something specific..." onkeydown="if(event.key==='Enter')sendAI()"/>
+            <button class="ai-send" onclick="sendAI()">Send</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="card">
+            <div class="card-title">Behavioral Signals</div>
+            <div class="scoring-signal"><span class="sig-name">AI interactions</span><span class="sig-val" id="ai-count">0</span></div>
+            <div class="scoring-signal"><span class="sig-name">Edge cases addressed</span><span class="sig-val" id="ec-count">0 / 4</span></div>
+            <div class="scoring-signal"><span class="sig-name">Specificity score</span><span class="sig-val" id="prompt-spec">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(2)">← Back</button>
+      <button class="btn-primary" onclick="nextModule(2)">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 3: OUTAGE ── -->
+  <div class="module-wrap" id="mod-3">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 03 / 07</span>
+        <span class="module-tag">Problem Discovery</span>
+      </div>
+      <h2 class="module-title">Outage Investigation</h2>
+      <p class="module-desc">Production is down. You've been paged. Six tools are available. We track which you open, in what order, and how long you spend. Form a hypothesis before you exhaust all tools.</p>
+    </div>
+
+    <div class="alert-banner">
+      <span class="alert-icon">🚨</span>
+      <div class="alert-text"><strong>P0 ALERT</strong> — Checkout service error rate: <strong>34%</strong>. Approximately 3,200 users affected per minute. Alert triggered 4 minutes ago. On-call escalation active.</div>
+      <span class="alert-time" id="incident-time">00:04:00</span>
+    </div>
+
+    <div class="investigation-tools">
+      <div class="inv-tool" id="tool-logs" onclick="openTool('logs')">
+        <div class="tool-icon">📄</div>
+        <div class="tool-name">APPLICATION LOGS</div>
+        <div class="tool-hint">Last 30min, all services</div>
+      </div>
+      <div class="inv-tool" id="tool-metrics" onclick="openTool('metrics')">
+        <div class="tool-icon">📈</div>
+        <div class="tool-name">METRICS</div>
+        <div class="tool-hint">CPU, memory, latency, errors</div>
+      </div>
+      <div class="inv-tool" id="tool-traces" onclick="openTool('traces')">
+        <div class="tool-icon">🔍</div>
+        <div class="tool-name">DISTRIBUTED TRACES</div>
+        <div class="tool-hint">Request spans across services</div>
+      </div>
+      <div class="inv-tool" id="tool-deploys" onclick="openTool('deploys')">
+        <div class="tool-icon">🚀</div>
+        <div class="tool-name">RECENT DEPLOYS</div>
+        <div class="tool-hint">Last 24 hours</div>
+      </div>
+      <div class="inv-tool" id="tool-db" onclick="openTool('db')">
+        <div class="tool-icon">🗄️</div>
+        <div class="tool-name">DATABASE STATUS</div>
+        <div class="tool-hint">Connections, queries, replication</div>
+      </div>
+      <div class="inv-tool" id="tool-ext" onclick="openTool('ext')">
+        <div class="tool-icon">🌐</div>
+        <div class="tool-name">EXTERNAL DEPS</div>
+        <div class="tool-hint">Third-party API status</div>
+      </div>
+    </div>
+
+    <!-- Tool Panels -->
+    <div class="tool-panel" id="panel-logs">
+      <div class="panel-title">Application Logs — Last 30 minutes</div>
+      <div class="log-line"><span class="log-time">14:22:08</span><span class="log-level info">INFO</span><span class="log-msg">checkout-service: request processed normally (p99: 180ms)</span></div>
+      <div class="log-line"><span class="log-time">14:38:41</span><span class="log-level warn">WARN</span><span class="log-msg">payment-service: response latency elevated (p99: 890ms)</span></div>
+      <div class="log-line"><span class="log-time">14:39:02</span><span class="log-level error">ERROR</span><span class="log-msg">checkout-service: upstream timeout from payment-service — ConnectionPoolTimeoutError</span></div>
+      <div class="log-line"><span class="log-time">14:39:15</span><span class="log-level error">ERROR</span><span class="log-msg">checkout-service: upstream timeout from payment-service — ConnectionPoolTimeoutError</span></div>
+      <div class="log-line"><span class="log-time">14:39:31</span><span class="log-level error">ERROR</span><span class="log-msg">payment-service: <span class="clue">db query timeout after 5000ms — fraud_score_lookup</span></span></div>
+      <div class="log-line"><span class="log-time">14:40:01</span><span class="log-level error">ERROR</span><span class="log-msg">checkout-service: upstream timeout from payment-service — 503</span></div>
+      <div class="log-line"><span class="log-time">14:41:22</span><span class="log-level error">ERROR</span><span class="log-msg">checkout-service: upstream timeout from payment-service — 503</span></div>
+      <div class="log-line"><span class="log-time">14:42:55</span><span class="log-level error">ERROR</span><span class="log-msg">payment-service: <span class="clue">connection pool exhausted (max: 50)</span> — queueing requests</span></div>
+    </div>
+
+    <div class="tool-panel" id="panel-metrics">
+      <div class="panel-title">Metrics Dashboard</div>
+      <div class="log-line"><span class="log-time">checkout</span><span class="log-level error">ERROR RATE</span><span class="log-msg">0.2% → <span class="clue">34%</span> spike from 14:39</span></div>
+      <div class="log-line"><span class="log-time">payment</span><span class="log-level warn">LATENCY</span><span class="log-msg">p99 jumped from 220ms → 4,800ms at 14:38</span></div>
+      <div class="log-line"><span class="log-time">payment</span><span class="log-level error">DB CONN</span><span class="log-msg"><span class="clue">Active connections: 50/50 (saturated)</span> from 14:39:45</span></div>
+      <div class="log-line"><span class="log-time">payment</span><span class="log-level warn">CPU</span><span class="log-msg">Normal (32%) — not a CPU issue</span></div>
+      <div class="log-line"><span class="log-time">payment</span><span class="log-level warn">MEMORY</span><span class="log-msg">Normal (58%) — not a memory issue</span></div>
+      <div class="log-line"><span class="log-time">other svc</span><span class="log-level info">ALL</span><span class="log-msg">All other services nominal</span></div>
+    </div>
+
+    <div class="tool-panel" id="panel-traces">
+      <div class="panel-title">Distributed Traces — Failing Requests</div>
+      <div class="log-line"><span class="log-time">span</span><span class="log-level info">INFO</span><span class="log-msg">checkout → payment-service: 4,920ms total</span></div>
+      <div class="log-line"><span class="log-time">span</span><span class="log-level error">SLOW</span><span class="log-msg">payment-service → postgres: <span class="clue">fraud_score_lookup: 4,880ms</span> (normally &lt;20ms)</span></div>
+      <div class="log-line"><span class="log-time">span</span><span class="log-level error">ERROR</span><span class="log-msg">postgres: <span class="clue">missing index on fraud_transactions.created_at</span> — full table scan</span></div>
+      <div class="log-line"><span class="log-time">note</span><span class="log-level warn">WARN</span><span class="log-msg">fraud_score_lookup is a <span class="highlight">new query pattern</span> — not present in traces before 14:38</span></div>
+    </div>
+
+    <div class="tool-panel" id="panel-deploys">
+      <div class="panel-title">Recent Deployments</div>
+      <div class="log-line"><span class="log-time">14:21 UTC</span><span class="log-level info">OK</span><span class="log-msg">notification-service v1.4.2 → production (health checks passed)</span></div>
+      <div class="log-line"><span class="log-time">14:38 UTC</span><span class="log-level highlight">⚡ NEW</span><span class="log-msg"><span class="clue">payment-service v3.2.0 → production</span> — "Add ML fraud scoring to payment flow"</span></div>
+      <div class="log-line"><span class="log-time">14:38</span><span class="log-level info">INFO</span><span class="log-msg">payment-service v3.2.0: health checks passed, deploy marked complete</span></div>
+      <div class="log-line"><span class="log-time">diff</span><span class="log-level warn">CHANGE</span><span class="log-msg"><span class="clue">New: calls fraud_score_lookup() on every payment before processing</span></span></div>
+    </div>
+
+    <div class="tool-panel" id="panel-db">
+      <div class="panel-title">Database Status</div>
+      <div class="log-line"><span class="log-time">primary</span><span class="log-level error">CONN</span><span class="log-msg"><span class="clue">Connection pool: 50/50 (100% — exhausted)</span></span></div>
+      <div class="log-line"><span class="log-time">primary</span><span class="log-level error">QUERY</span><span class="log-msg">Slow query log: <span class="clue">fraud_transactions full table scan</span> — 4,200ms avg</span></div>
+      <div class="log-line"><span class="log-time">primary</span><span class="log-level warn">INDEX</span><span class="log-msg">fraud_transactions.created_at — <span class="clue">no index</span> (table: 18M rows)</span></div>
+      <div class="log-line"><span class="log-time">replication</span><span class="log-level info">OK</span><span class="log-msg">Replica lag: 140ms — within normal range</span></div>
+    </div>
+
+    <div class="tool-panel" id="panel-ext">
+      <div class="panel-title">External Dependencies</div>
+      <div class="log-line"><span class="log-time">Stripe</span><span class="log-level info">OK</span><span class="log-msg">Operational — no incidents reported</span></div>
+      <div class="log-line"><span class="log-time">Twilio</span><span class="log-level info">OK</span><span class="log-msg">Operational</span></div>
+      <div class="log-line"><span class="log-time">SendGrid</span><span class="log-level info">OK</span><span class="log-msg">Operational</span></div>
+      <div class="log-line"><span class="log-time">AWS SES</span><span class="log-level info">OK</span><span class="log-msg">Operational — no degradation</span></div>
+      <div class="log-line" style="margin-top:8px;"><span class="log-time">note</span><span class="log-level info">INFO</span><span class="log-msg">All external services nominal. Issue is internal.</span></div>
+    </div>
+
+    <span class="field-label">Running Hypothesis — write as you investigate</span>
+    <textarea id="hypothesis-text" rows="4" placeholder="What are you seeing? What are you ruling out? What do you think caused this?" oninput="trackHypothesis()"></textarea>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Behavioral Signals</div>
+      <div class="scoring-signal"><span class="sig-name">Investigation order</span><span class="sig-val" id="tool-order">—</span></div>
+      <div class="scoring-signal"><span class="sig-name">Hypothesis written before all tools opened?</span><span class="sig-val" id="hyp-timing">Pending</span></div>
+      <div class="scoring-signal"><span class="sig-name">Tools opened</span><span class="sig-val" id="tools-opened">0 / 6</span></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(3)">← Back</button>
+      <button class="btn-primary" onclick="nextModule(3)">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 4: COMMS ── -->
+  <div class="module-wrap" id="mod-4">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 04 / 07</span>
+        <span class="module-tag">Written Communication</span>
+      </div>
+      <h2 class="module-title">Incident Communication</h2>
+      <p class="module-desc">Two communication tasks. Write clearly for a non-technical audience. The rubric scores in real time.</p>
+    </div>
+
+    <div class="prompt-box">
+      <p><strong>Task 4A — Incident Email:</strong> It's 2:30am. Payment service has been returning 503s for 22 minutes. Cause identified: a deploy introduced a slow fraud scoring query exhausting the DB connection pool. Rollback is in progress, ETA 8 minutes. Write the stakeholder update email.</p>
+    </div>
+
+    <span class="field-label">Stakeholder Email</span>
+    <textarea id="email-text" rows="8" placeholder="Write your stakeholder email here. Not everyone reading it is technical." oninput="scoreEmail()"></textarea>
+    <div class="word-counter" id="email-wc">0 words</div>
+
+    <div class="rubric-live" id="email-rubric">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;margin-top:8px;">Live Rubric</div>
+      <div class="rubric-item" id="r-impact"><div class="rubric-check">✓</div><span class="rubric-label">Impact scope — who is affected and how</span></div>
+      <div class="rubric-item" id="r-status"><div class="rubric-check">✓</div><span class="rubric-label">Current status and ETA provided</span></div>
+      <div class="rubric-item" id="r-cause"><div class="rubric-check">✓</div><span class="rubric-label">Plain-language cause explanation</span></div>
+      <div class="rubric-item" id="r-action"><div class="rubric-check">✓</div><span class="rubric-label">Next steps with a named owner</span></div>
+      <div class="rubric-item" id="r-tone"><div class="rubric-check">✓</div><span class="rubric-label">Blame-free, factual tone</span></div>
+    </div>
+
+    <div class="prompt-box" style="margin-top:32px;">
+      <p><strong>Task 4B — Ambiguity Memo:</strong> PM message received: <em>"Can we add social login? Should be straightforward, can we get this by end of sprint?"</em> Write a structured decision memo. Sections: (1) What I understand the ask to be, (2) Questions I need answered, (3) Options and tradeoffs, (4) My recommendation and effort estimate.</p>
+    </div>
+
+    <span class="field-label">Decision Memo</span>
+    <textarea id="memo-text" rows="12" placeholder="Write your structured decision memo here..." oninput="trackMemo()"></textarea>
+    <div class="word-counter" id="memo-wc">0 words</div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(4)">← Back</button>
+      <button class="btn-primary" onclick="nextModule(4)">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 5: DOCS ── -->
+  <div class="module-wrap" id="mod-5">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 05 / 07</span>
+        <span class="module-tag">Research & Autonomy</span>
+      </div>
+      <h2 class="module-title">Feature Build from Docs</h2>
+      <p class="module-desc">Build a feature using only the internal documentation. Every section you visit, in what order, and how long you spend — all tracked.</p>
+    </div>
+
+    <div class="prompt-box">
+      <p><strong>Task:</strong> Implement a webhook delivery system that retries on failure using exponential backoff. Use the internal tool documentation available in the panel on the left. Write your implementation plan and explain each tool choice.</p>
+    </div>
+
+    <div class="docs-layout">
+      <div class="docs-sidebar">
+        <div class="docs-sidebar-title">Internal Docs</div>
+        <div class="doc-nav-item" onclick="openDoc('queue')">Queue Service<span class="visit-count" id="v-queue"></span></div>
+        <div class="doc-nav-item" onclick="openDoc('http')">HTTP Client Lib<span class="visit-count" id="v-http"></span></div>
+        <div class="doc-nav-item" onclick="openDoc('retry')">⭐ Retry Utility<span class="visit-count" id="v-retry"></span></div>
+        <div class="doc-nav-item" onclick="openDoc('secrets')">Secrets Manager<span class="visit-count" id="v-secrets"></span></div>
+        <div class="doc-nav-item" onclick="openDoc('alerts')">Alerting SDK<span class="visit-count" id="v-alerts"></span></div>
+        <div class="doc-nav-item" onclick="openDoc('logging')">Logging Framework<span class="visit-count" id="v-logging"></span></div>
+      </div>
+
+      <div class="docs-content" id="docs-content">
+        <p style="color:var(--text-muted);font-size:13px;">Select a documentation section from the left to read it.</p>
+      </div>
+    </div>
+
+    <span class="field-label">Implementation Plan</span>
+    <textarea id="impl-text" rows="8" placeholder="Write your implementation plan and explain each tool choice. What did you pick, what did you skip, and why?" oninput="trackImpl()"></textarea>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Behavioral Signals</div>
+      <div class="scoring-signal"><span class="sig-name">Docs visited</span><span class="sig-val" id="docs-visited-count">0 / 6</span></div>
+      <div class="scoring-signal"><span class="sig-name">Retry Utility found?</span><span class="sig-val" id="retry-found">—</span></div>
+      <div class="scoring-signal"><span class="sig-name">Idempotency config noted?</span><span class="sig-val" id="idempotency-noted">—</span></div>
+      <div class="scoring-signal"><span class="sig-name">Navigation order</span><span class="sig-val" id="doc-nav-order">—</span></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(5)">← Back</button>
+      <button class="btn-primary" onclick="nextModule(5)">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 6: SLACK ── -->
+  <div class="module-wrap" id="mod-6">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 06 / 07</span>
+        <span class="module-tag">Collaborative Judgment</span>
+      </div>
+      <h2 class="module-title">Collaborative Judgment</h2>
+      <p class="module-desc">You've just joined the team. Here's a live decision thread. Reply as you would normally. Read the full thread before responding.</p>
+    </div>
+
+    <div class="slack-header">
+      <span>#eng-architecture</span>
+      <span class="slack-channel">/ message-queue-migration</span>
+      <span style="margin-left:auto;">4 participants · thread started 23 min ago</span>
+    </div>
+
+    <div class="slack-thread">
+      <div class="slack-msg">
+        <div class="slack-avatar" style="background:#2d3748;color:#a78bfa;">SR</div>
+        <div class="slack-msg-body">
+          <div class="slack-msg-header"><span class="slack-name">Sam R.</span><span class="slack-role senior">SENIOR</span><span class="slack-time">2:07 PM</span></div>
+          <div class="slack-msg-text">Team — we need to migrate off RabbitMQ. It's been a reliability problem and we've had 3 incidents this quarter. I've looked at the options and Kafka is clearly the right call. It's battle-tested at scale, we get replay, and our infra team already runs it for the data pipeline. I'd like to move forward with a proposal this week. Thoughts?</div>
+        </div>
+      </div>
+
+      <div class="slack-msg">
+        <div class="slack-avatar" style="background:#2d3748;color:#fbd38d;">PL</div>
+        <div class="slack-msg-body">
+          <div class="slack-msg-header"><span class="slack-name">Priya L.</span><span class="slack-role pm">PM</span><span class="slack-time">2:11 PM</span></div>
+          <div class="slack-msg-text">Thanks Sam. What's the timeline impact? We have the checkout v2 launch in 6 weeks and I need to understand if this affects that. Can someone give me a clear yes/no on whether we can do both?</div>
+        </div>
+      </div>
+
+      <div class="slack-msg">
+        <div class="slack-avatar" style="background:#2d3748;color:#68d391;">JK</div>
+        <div class="slack-msg-body">
+          <div class="slack-msg-header"><span class="slack-name">Jordan K.</span><span class="slack-role junior">JUNIOR</span><span class="slack-time">2:14 PM</span></div>
+          <div class="slack-msg-text">I actually looked at this last month and put together some notes on Redis Streams as an option — it's much simpler to operate, our team already knows it from caching, and for our message volume it would handle the load fine. I can share the doc if useful? <span class="reaction">📄 1</span></div>
+        </div>
+      </div>
+
+      <div class="slack-msg">
+        <div class="slack-avatar" style="background:#2d3748;color:#a78bfa;">SR</div>
+        <div class="slack-msg-body">
+          <div class="slack-msg-header"><span class="slack-name">Sam R.</span><span class="slack-role senior">SENIOR</span><span class="slack-time">2:18 PM</span></div>
+          <div class="slack-msg-text">Redis Streams doesn't have the durability guarantees we need. We had a data loss incident with Redis last year. Kafka is the right call here. Jordan — I appreciate the research but this is a tier-1 infrastructure decision, let's not over-complicate it with more options. <span class="mention">@Priya</span> — migration would take 3 weeks minimum, so yes it affects the checkout launch.</div>
+        </div>
+      </div>
+
+      <div class="slack-msg">
+        <div class="slack-avatar" style="background:#2d3748;color:#4da6ff;">MO</div>
+        <div class="slack-msg-body">
+          <div class="slack-msg-header"><span class="slack-name">Marcus O.</span><span class="slack-role senior">SENIOR</span><span class="slack-time">2:24 PM</span></div>
+          <div class="slack-msg-text">I'm +1 on moving off RabbitMQ. I think Kafka makes sense long-term. One thing I'll flag: our team has zero Kafka ops experience and the learning curve is real — we should factor in at least 2 sprint ramp time before we're confident running it in prod. Also, just worth noting: Kafka needs Zookeeper (or KRaft), so this isn't just a broker swap, it's an entirely new infrastructure dependency. Are we sure the infra team owns the operational burden here, or does it land on us?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What this thread contains — scoring dimensions (covert — candidates are not shown this)</div>
+      <div class="slack-signal-flags">
+        <div class="signal-flag"><span class="sf-label">JUNIOR DISMISSED</span><span class="sf-desc">Jordan's Redis Streams research was dismissed without engagement. Does the candidate acknowledge it?</span></div>
+        <div class="signal-flag"><span class="sf-label">PM UNANSWERED</span><span class="sf-desc">Priya needs a clear yes/no on checkout launch impact. Nobody gave it. Does the candidate address her?</span></div>
+        <div class="signal-flag"><span class="sf-label">HIDDEN FLAW</span><span class="sf-desc">Kafka requires Zookeeper/KRaft — it's not a simple broker swap. Marcus flagged ops load but not infra dependency clearly. Does the candidate catch it?</span></div>
+        <div class="signal-flag"><span class="sf-label">POSITION CLARITY</span><span class="sf-desc">Does the candidate take a position or hedge everything? Does their reply move toward a decision?</span></div>
+      </div>
+    </div>
+
+    <span class="field-label">Your Reply</span>
+    <textarea id="slack-reply" rows="8" placeholder="Write your reply to the thread. Reply as you would normally — you don't need to address every person explicitly." oninput="scoreSlack()"></textarea>
+    <div class="word-counter" id="slack-wc">0 words</div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(6)">← Back</button>
+      <button class="btn-primary" onclick="nextModule(6)">Save & Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── MODULE 7: VALUES ── -->
+  <div class="module-wrap" id="mod-7">
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-num">MODULE 07 / 07</span>
+        <span class="module-tag">Values & Judgment</span>
+      </div>
+      <h2 class="module-title">Values & Tradeoffs</h2>
+      <p class="module-desc">Three scenarios. No right answer. After your initial response, you'll be asked to argue the opposing position. Your orientation is inferred from how you reason, not just what you conclude.</p>
+    </div>
+
+    <div class="scenario-block">
+      <div class="scenario-num">Scenario 01</div>
+      <div class="scenario-text">Your inventory cache is 90 seconds stale, causing occasional oversells. The proper architectural fix takes 6 weeks. The quick fix is to cut the cache TTL to 5 seconds — this adds $4,200/month in DB costs and increases p99 latency by 180ms. Your head of ops wants the quick fix this week. What do you do and why?</div>
+      <div class="scenario-tags">
+        <span class="scenario-tag">Cost vs. UX</span>
+        <span class="scenario-tag">Short-term vs. Long-term</span>
+        <span class="scenario-tag">Operational</span>
+      </div>
+    </div>
+    <span class="field-label" style="margin-top:0">Your response</span>
+    <textarea id="v1-text" rows="5" placeholder="What do you do and why? Be specific about your reasoning." oninput="updateWC('v1-text','v1-wc')"></textarea>
+    <div class="word-counter" id="v1-wc">0 words</div>
+
+    <div class="scenario-block" style="margin-top:24px;">
+      <div class="scenario-num">Scenario 02</div>
+      <div class="scenario-text">You can deploy 10x per day at a 0.3% error rate, or 2x per week at a 0.05% error rate. Your team is debating which engineering culture to adopt. Where do you land and why?</div>
+      <div class="scenario-tags">
+        <span class="scenario-tag">Velocity vs. Reliability</span>
+        <span class="scenario-tag">Culture</span>
+        <span class="scenario-tag">Risk tolerance</span>
+      </div>
+    </div>
+    <span class="field-label" style="margin-top:0">Your response</span>
+    <textarea id="v2-text" rows="5" placeholder="Where do you land and why? What are you optimizing for?" oninput="updateWC('v2-text','v2-wc')"></textarea>
+    <div class="word-counter" id="v2-wc">0 words</div>
+
+    <div class="scenario-block" style="margin-top:24px;">
+      <div class="scenario-num">Scenario 03 — Challenge Response</div>
+      <div class="scenario-text">
+        <strong>Earlier in this assessment you submitted a decision memo.</strong> A senior engineer has replied:<br><br>
+        <em style="color:var(--text-dim);display:block;padding:10px 14px;border-left:2px solid var(--border);margin:10px 0;">"I've read your memo. I think you're significantly underestimating the OAuth complexity here — we tried this 18 months ago with a different provider and it took 3x the estimate. I'd push back on the timeline, and I'm not sure Option A is the right call. Your assumptions on provider support aren't accurate either. What's your thinking?"</em>
+        How do you reply?
+      </div>
+    </div>
+    <span class="field-label" style="margin-top:0">Your reply</span>
+    <textarea id="v3-text" rows="5" placeholder="How do you respond to this challenge?" oninput="updateWC('v3-text','v3-wc')"></textarea>
+    <div class="word-counter" id="v3-wc">0 words</div>
+
+    <div class="orientation-meter" id="orient-meter">
+      <div class="orient-col">
+        <span class="orient-label">CUSTOMER</span>
+        <div class="orient-bar"><div class="orient-fill" id="o-customer"></div></div>
+      </div>
+      <div class="orient-col">
+        <span class="orient-label">BUSINESS</span>
+        <div class="orient-bar"><div class="orient-fill" id="o-business"></div></div>
+      </div>
+      <div class="orient-col">
+        <span class="orient-label">CRAFT</span>
+        <div class="orient-bar"><div class="orient-fill" id="o-craft"></div></div>
+      </div>
+      <div class="orient-col">
+        <span class="orient-label">OPS</span>
+        <div class="orient-bar"><div class="orient-fill" id="o-ops"></div></div>
+      </div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px;">Orientation inference — updates as you write</div>
+
+    <div class="nav-buttons">
+      <button class="btn-secondary" onclick="prevModule(7)">← Back</button>
+      <button class="btn-primary" onclick="showResults()">Complete Assessment →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════ RESULTS ═══ -->
+<div id="results-screen">
+  <div class="results-header">
+    <div class="results-candidate">
+      <div class="results-name">Candidate Report</div>
+      <div class="results-meta">Assessment completed · March 2026 · Holocron Platform</div>
+    </div>
+    <div class="verdict-badge recommend" id="verdict-badge">RECOMMEND: TECHNICAL INTERVIEW</div>
+  </div>
+
+  <div class="fit-score-block">
+    <div class="fit-label">Weighted Role Fit Score</div>
+    <div class="fit-number" id="fit-score">74%</div>
+    <div class="fit-sub">vs. ideal profile: Senior Backend Engineer · Gap areas flagged below</div>
+  </div>
+
+  <div class="module-scores-grid" id="module-scores-grid">
+    <!-- populated by JS -->
+  </div>
+
+  <div class="dimensions-section">
+    <div class="section-title">Dimension Profile vs. Ideal</div>
+    <div class="dim-rows" id="dim-rows">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <div class="scoring-methodology">
+    <h3>How Each Module Was Scored</h3>
+    <table class="scoring-table">
+      <thead>
+        <tr><th>Module</th><th>Behavioral Signals (auto)</th><th>Qualitative (AI rubric)</th><th>Max Score</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>System Design</td>
+          <td>Decision order, revision count, rate limiter/monitoring added, first component time</td>
+          <td>Tradeoff quality: stakeholder coverage (UX + cost + reliability), assumption surfacing, intellectual honesty about downsides</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Debugging with AI</td>
+          <td>AI interaction count, prompt specificity (vague vs. targeted), blind copy-paste %, edge cases addressed (4 hidden)</td>
+          <td>Code correctness, validation reasoning, did they question AI output before accepting</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Outage Investigation</td>
+          <td>Tool open order, hypothesis timing (before/after exhausting tools), tools opened, time per tool</td>
+          <td>Root cause accuracy, causal chain clarity, second-order implications (monitoring gap, circuit breaker behavior)</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Incident Comms</td>
+          <td>Rubric element coverage (5 items), word count, time spent</td>
+          <td>Email: audience awareness, tone, lead clarity. Memo: assumption identification, option structure, recommendation concreteness</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Feature Build from Docs</td>
+          <td>Sections visited, visit order, visit count per section, retry utility found (yes/no), idempotency config noted</td>
+          <td>Tool selection accuracy, irrelevant tool rejection, implementation plan coherence, doc-to-output fidelity</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Collaborative Judgment</td>
+          <td>Word count, response time, covert signal detection (junior acknowledgment, PM addressed, flaw caught, position clarity)</td>
+          <td>Tone under social pressure, resolution orientation, stakeholder translation quality</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+        <tr>
+          <td>Values & Tradeoffs</td>
+          <td>Keyword orientation tagging (customer/business/craft/ops signals), challenge response engagement</td>
+          <td>Stakeholder coverage, assumption surfacing, intellectual openness (challenge), intellectual honesty, comfort with ambiguity</td>
+          <td><span class="score-pill">100 pts</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+const state = {
+  currentModule: 0,
+  startTime: null,
+  timerInterval: null,
+  moduleStartTimes: {},
+
+  // M1
+  components: [],
+  componentOrder: [],
+  tradeoffWords: 0,
+
+  // M2
+  aiInteractions: 0,
+  aiPrompts: [],
+  ecRevealed: [false,false,false,false],
+  ecAddressed: [false,false,false,false],
+  debugChars: 0,
+
+  // M3
+  toolsOpened: [],
+  hypothesisWrittenBefore: false,
+  hypothesisStarted: false,
+  allToolsOpened: false,
+
+  // M4
+  emailRubric: {impact:false,status:false,cause:false,action:false,tone:false},
+  memoWords: 0,
+
+  // M5
+  docsVisited: {},
+  docNavOrder: [],
+  retryFound: false,
+  idempotencyFound: false,
+
+  // M6
+  slackWords: 0,
+
+  // M7
+  v1words: 0, v2words: 0, v3words: 0,
+  orientation: {customer:0, business:0, craft:0, ops:0},
+
+  // Scores
+  moduleScores: [0,0,0,0,0,0,0],
+  dimensions: {
+    customerOrientation: 0, businessAwareness: 0, technicalCraft: 0,
+    operationalStability: 0, intellectualHonesty: 0, assumptionAwareness: 0,
+    comfortAmbiguity: 0, communicationClarity: 0, structuredThinking: 0,
+    aiCollaborationMaturity: 0, intellectualOpenness: 0, collaborativeGenerosity: 0,
+    stakeholderTranslation: 0
+  }
+};
+
+const IDEAL_PROFILE = {
+  customerOrientation: 9, businessAwareness: 8, technicalCraft: 7,
+  operationalStability: 8, intellectualHonesty: 9, assumptionAwareness: 8,
+  comfortAmbiguity: 7, communicationClarity: 9, structuredThinking: 8,
+  aiCollaborationMaturity: 8, intellectualOpenness: 8, collaborativeGenerosity: 8,
+  stakeholderTranslation: 9
+};
+
+const IDEAL_WEIGHTS = {
+  customerOrientation: 'High', businessAwareness: 'High', technicalCraft: 'Medium',
+  operationalStability: 'High', intellectualHonesty: 'High', assumptionAwareness: 'Medium',
+  comfortAmbiguity: 'Medium', communicationClarity: 'High', structuredThinking: 'High',
+  aiCollaborationMaturity: 'Medium', intellectualOpenness: 'High', collaborativeGenerosity: 'High',
+  stakeholderTranslation: 'High'
+};
+
+const WEIGHT_VALUES = { High: 1.5, Medium: 1.0, Low: 0.6 };
+
+// ── DOCS CONTENT ───────────────────────────────────────
+const docsContent = {
+  queue: `<h3>Queue Service</h3><p>An async message queue for inter-service communication. Supports publish/subscribe and point-to-point delivery.</p><ul><li>Durable: messages persist until acknowledged</li><li>Max throughput: ~10,000 msg/sec</li><li>Supports dead-letter queues for failed messages</li><li>Does not support retry logic natively — use with Retry Utility</li></ul><p>Use for: fire-and-forget async tasks, fan-out notifications, decoupled service communication.</p>`,
+  http: `<h3>HTTP Client Library</h3><p>A wrapper around the standard HTTP client with connection pooling and request tracing built in.</p><ul><li>Automatic retry on 5xx (configurable, default: 0)</li><li>Request/response logging included</li><li>Timeout parameter required on all calls (no default)</li><li>Supports async/await</li></ul><p>Use for: outbound webhook delivery, calling external APIs.</p><code>client.post(url, payload, timeout=5000)</code>`,
+  retry: `<h3>Retry Utility</h3><p>Configurable exponential backoff retry wrapper for any async function.</p><ul><li>Exponential backoff with jitter (default: 100ms base, 2x multiplier)</li><li>Max retries: configurable (default: 3)</li><li>Supports custom retry conditions (e.g., retry only on timeout, not 4xx)</li><li><code>idempotency_key</code> parameter — <strong>prevents duplicate delivery on retry</strong>. Set to a stable unique ID per webhook event to guarantee at-most-once delivery.</li></ul><div class="doc-note">⭐ <strong>Idempotency key:</strong> Pass <code>idempotency_key=event_id</code> to prevent duplicate webhook delivery. Without this, retries may fire the webhook multiple times. This is critical for payment webhooks.</div><code>retry.wrap(fn, max_retries=3, base_delay=100, idempotency_key=None)</code>`,
+  secrets: `<h3>Secrets Manager</h3><p>Secure credential store for API keys, tokens, and connection strings.</p><ul><li>Automatic rotation for supported secret types</li><li>Audit log on every access</li><li>Access via: <code>secrets.get('key-name')</code></li></ul><p>Use for: webhook signing secrets, API tokens. Not relevant for message routing logic.</p>`,
+  alerts: `<h3>Alerting SDK</h3><p>Fire-and-forget alerts to PagerDuty, Slack, or email. Use for operational events.</p><ul><li>Severity levels: INFO, WARN, CRITICAL</li><li>Supports routing by team</li></ul><p>Not relevant for webhook delivery logic. Use for monitoring dead-letter queues or failed delivery thresholds.</p>`,
+  logging: `<h3>Logging Framework</h3><p>Structured JSON logging. Automatically ships to Datadog and CloudWatch.</p><ul><li>log.info(), log.warn(), log.error() — all accept key-value pairs</li><li>Request tracing context injected automatically</li></ul><p>Relevant: log each webhook attempt, outcome, and retry count. Not a replacement for retry or queue logic.</p>`
+};
+
+// ── INTRO → START ──────────────────────────────────────
+function startAssessment() {
+  document.getElementById('intro-screen').style.display = 'none';
+  const a = document.getElementById('assessment');
+  a.style.display = 'flex';
+  a.style.flexDirection = 'column';
+  state.startTime = Date.now();
+  state.currentModule = 1;
+  startTimer();
+  updateProgress(1);
+}
+
+// ── TIMER ──────────────────────────────────────────────
+function startTimer() {
+  const totalSeconds = 105 * 60;
+  state.timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    const remaining = Math.max(0, totalSeconds - elapsed);
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    const el = document.getElementById('timer');
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', remaining < 600);
+  }, 1000);
+}
+
+// ── NAVIGATION ─────────────────────────────────────────
+function nextModule(from) {
+  computeModuleScore(from);
+  document.getElementById(`mod-${from}`).classList.remove('active');
+  if (from < 7) {
+    document.getElementById(`mod-${from+1}`).classList.add('active');
+    state.currentModule = from + 1;
+    updateProgress(from + 1);
+    window.scrollTo(0, 0);
+  }
+}
+
+function prevModule(from) {
+  document.getElementById(`mod-${from}`).classList.remove('active');
+  document.getElementById(`mod-${from-1}`).classList.add('active');
+  state.currentModule = from - 1;
+  updateProgress(from - 1);
+  window.scrollTo(0, 0);
+}
+
+function updateProgress(active) {
+  document.querySelectorAll('.progress-seg').forEach((s, i) => {
+    s.classList.remove('active','done');
+    if (i < active - 1) s.classList.add('done');
+    else if (i === active - 1) s.classList.add('active');
+  });
+}
+
+// ── MODULE 1: ARCH ──────────────────────────────────────
+let compPositions = {};
+let firstCompTime = null;
+
+function addComponent(el, name, icon) {
+  if (el.classList.contains('placed')) return;
+  el.classList.add('placed');
+  if (!firstCompTime) { firstCompTime = ((Date.now() - state.startTime)/1000).toFixed(0) + 's'; document.getElementById('first-time').textContent = firstCompTime; }
+  state.componentOrder.push(name);
+  state.components.push(name);
+  document.getElementById('canvas-hint').style.display = 'none';
+
+  const canvas = document.getElementById('arch-canvas');
+  const div = document.createElement('div');
+  div.className = 'arch-component';
+  div.innerHTML = `<span class="comp-icon">${icon}</span>${name}`;
+  const cols = state.components.length;
+  div.style.left = (30 + (cols % 4) * 180) + 'px';
+  div.style.top = (30 + Math.floor((cols-1) / 4) * 90) + 'px';
+  makeDraggable(div);
+  canvas.appendChild(div);
+
+  document.getElementById('comp-count').textContent = state.components.length;
+  if (name === 'Rate Limiter') document.getElementById('rl-status').textContent = `✓ (step ${cols})`;
+  if (name === 'Monitoring') document.getElementById('mon-status').textContent = `✓ (step ${cols})`;
+  if (name === 'Circuit Breaker') document.getElementById('cb-status').textContent = `✓ (step ${cols})`;
+}
+
+function makeDraggable(el) {
+  let ox, oy;
+  el.onmousedown = e => {
+    el.classList.add('dragging');
+    ox = e.clientX - el.offsetLeft;
+    oy = e.clientY - el.offsetTop;
+    const canvas = document.getElementById('arch-canvas');
+    document.onmousemove = ev => { el.style.left=(ev.clientX-ox)+'px'; el.style.top=(ev.clientY-oy)+'px'; };
+    document.onmouseup = () => { el.classList.remove('dragging'); document.onmousemove = null; document.onmouseup = null; };
+    e.preventDefault();
+  };
+}
+
+function trackTradeoffs() {
+  const words = countWords(document.getElementById('tradeoffs-text').value);
+  document.getElementById('tradeoffs-wc').textContent = words + ' words';
+  state.tradeoffWords = words;
+}
+
+// ── MODULE 2: DEBUG ────────────────────────────────────
+const ecThresholds = [30, 80, 150, 250];
+const ecKeywords = [
+  ['timeout'],
+  ['empty', '[]', 'len(', 'if not orders', 'if orders'],
+  ['keyerror', 'key', '.get(', 'malformed', "order.get"],
+  ['atomicity', 'partial', 'rollback', 'transaction', 'all_or_nothing', 'failed_orders']
+];
+
+function trackDebug(val) {
+  const chars = val.length;
+  state.debugChars = chars;
+  ecThresholds.forEach((t, i) => {
+    if (chars >= t && !state.ecRevealed[i]) {
+      state.ecRevealed[i] = true;
+      document.getElementById(`ec-${i+1}`).classList.add('revealed');
+    }
+    if (state.ecRevealed[i]) {
+      const lower = val.toLowerCase();
+      const addressed = ecKeywords[i].some(kw => lower.includes(kw));
+      const wasAddressed = state.ecAddressed[i];
+      state.ecAddressed[i] = addressed;
+      const el = document.getElementById(`ec-${i+1}`);
+      const st = document.getElementById(`ec-${i+1}-status`);
+      if (addressed) { el.classList.add('addressed'); st.textContent = '✓ Addressed'; }
+      else { el.classList.remove('addressed'); st.textContent = 'Unaddressed'; }
+    }
+  });
+  document.getElementById('ec-count').textContent = state.ecAddressed.filter(Boolean).length + ' / 4';
+}
+
+const aiResponses = {
+  default: "That's an interesting question. Look carefully at what happens when the external call experiences a network delay. What's the failure mode?",
+  timeout: "Good catch. The `timeout` parameter is defined in the function signature but never actually passed to `requests.post()`. That means slow payment API responses will cause the thread to hang indefinitely with no recovery.",
+  empty: "Think about what `requests.post` does when the loop never executes. The caller receives an empty list — do they know if that means success or if orders simply weren't processed?",
+  keyerror: "If an order dict is missing the 'id' or 'total' key, a KeyError is raised inside the try block — and then silently swallowed by `except Exception: pass`. The order is lost with no signal.",
+  partial: "This is a subtle atomicity issue. If order 3 of 5 fails, orders 1 and 2 have already been charged. The caller gets back a partial results list but has no way to know which orders succeeded and which didn't — and there's no rollback mechanism.",
+  fix: "The core bug is the silent `except: pass` — errors should be caught, logged, and returned as failures in the result set. Beyond that, consider: timeout passthrough, empty input handling, key validation, and what the caller should receive when some orders fail."
+};
+
+function sendAI() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  state.aiInteractions++;
+  state.aiPrompts.push(msg);
+  document.getElementById('ai-count').textContent = state.aiInteractions;
+
+  const lower = msg.toLowerCase();
+  let specificity = lower.split(' ').length > 5 ? (lower.includes('what') || lower.includes('why') || lower.includes('if') ? 'High' : 'Medium') : 'Low';
+  document.getElementById('prompt-spec').textContent = specificity;
+
+  const msgs = document.getElementById('ai-messages');
+  msgs.innerHTML += `<div class="ai-msg user"><div class="msg-label">YOU</div>${msg}</div>`;
+
+  let resp = aiResponses.default;
+  if (lower.includes('timeout')) resp = aiResponses.timeout;
+  else if (lower.includes('empty') || lower.includes('no orders')) resp = aiResponses.empty;
+  else if (lower.includes('key') || lower.includes('missing') || lower.includes('malform')) resp = aiResponses.keyerror;
+  else if (lower.includes('partial') || lower.includes('atomic') || lower.includes('rollback')) resp = aiResponses.partial;
+  else if (lower.includes('fix') || lower.includes('bug') || lower.includes('issue')) resp = aiResponses.fix;
+
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="ai-msg assistant"><div class="msg-label">AI</div>${resp}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 600);
+
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── MODULE 3: OUTAGE ───────────────────────────────────
+function openTool(tool) {
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.inv-tool').forEach(t => t.classList.remove('active-tool'));
+  document.getElementById(`panel-${tool}`).classList.add('active');
+  document.getElementById(`tool-${tool}`).classList.add('opened');
+
+  if (!state.toolsOpened.includes(tool)) {
+    state.toolsOpened.push(tool);
+    document.getElementById('tools-opened').textContent = state.toolsOpened.length + ' / 6';
+    document.getElementById('tool-order').textContent = state.toolsOpened.map(t => t.slice(0,3).toUpperCase()).join(' → ');
+    if (state.toolsOpened.length === 6) state.allToolsOpened = true;
+  }
+
+  if (!state.hypothesisStarted && state.toolsOpened.length > 0 && document.getElementById('hypothesis-text').value.length > 20) {
+    state.hypothesisStarted = true;
+    if (!state.allToolsOpened) {
+      state.hypothesisWrittenBefore = true;
+      document.getElementById('hyp-timing').textContent = '✓ Before all tools';
+    }
+  }
+}
+
+function trackHypothesis() {
+  const val = document.getElementById('hypothesis-text').value;
+  if (val.length > 20 && !state.hypothesisStarted) {
+    state.hypothesisStarted = true;
+    if (!state.allToolsOpened) {
+      state.hypothesisWrittenBefore = true;
+      document.getElementById('hyp-timing').textContent = '✓ Before all tools';
+    } else {
+      document.getElementById('hyp-timing').textContent = 'After tools';
+    }
+  }
+}
+
+// ── MODULE 4: EMAIL ────────────────────────────────────
+function scoreEmail() {
+  const text = document.getElementById('email-text').value.toLowerCase();
+  const wc = countWords(text);
+  document.getElementById('email-wc').textContent = wc + ' words';
+
+  const checks = {
+    'r-impact': ['affect', 'user', 'customer', 'impact', 'experience', 'checkout'],
+    'r-status': ['rollback', 'progress', 'eta', 'minute', 'restoring', 'fix', 'resolved'],
+    'r-cause': ['deploy', 'query', 'database', 'connection', 'fraud', 'slow', 'cause'],
+    'r-action': ['team', 'will', 'monitoring', 'next step', 'update', 'confirm'],
+    'r-tone': text => !/(blame|fault|mistake|screwup|failure of|who caused)/i.test(text)
+  };
+
+  Object.entries(checks).forEach(([id, check]) => {
+    const el = document.getElementById(id);
+    const met = typeof check === 'function' ? check(text) : check.some(kw => text.includes(kw));
+    el.classList.toggle('met', met);
+    state.emailRubric[id.replace('r-','')] = met;
+  });
+}
+
+function trackMemo() {
+  const wc = countWords(document.getElementById('memo-text').value);
+  document.getElementById('memo-wc').textContent = wc + ' words';
+}
+
+// ── MODULE 5: DOCS ──────────────────────────────────────
+function openDoc(id) {
+  document.querySelectorAll('.doc-nav-item').forEach((el, i) => {
+    const docId = ['queue','http','retry','secrets','alerts','logging'][i];
+    if (docId === id) {
+      el.classList.add('viewed');
+      if (!state.docsVisited[id]) {
+        state.docsVisited[id] = 0;
+        state.docNavOrder.push(id);
+        document.getElementById('doc-nav-order').textContent = state.docNavOrder.map(d=>d.slice(0,3).toUpperCase()).join('→');
+        document.getElementById('docs-visited-count').textContent = Object.keys(state.docsVisited).length + ' / 6';
+        if (id === 'retry') {
+          state.retryFound = true;
+          document.getElementById('retry-found').textContent = '✓ Yes';
+        }
+      }
+      state.docsVisited[id] = (state.docsVisited[id] || 0) + 1;
+      const vc = document.getElementById(`v-${id}`);
+      if (vc) vc.textContent = state.docsVisited[id] > 1 ? `×${state.docsVisited[id]}` : '';
+    }
+  });
+  document.getElementById('docs-content').innerHTML = docsContent[id] || '<p>Content not found.</p>';
+}
+
+function trackImpl() {
+  const text = document.getElementById('impl-text').value.toLowerCase();
+  if ((text.includes('idempotent') || text.includes('idempotency') || text.includes('duplicate')) && state.retryFound) {
+    state.idempotencyFound = true;
+    document.getElementById('idempotency-noted').textContent = '✓ Yes';
+  }
+}
+
+// ── MODULE 6: SLACK ────────────────────────────────────
+function scoreSlack() {
+  const text = document.getElementById('slack-reply').value;
+  const wc = countWords(text);
+  document.getElementById('slack-wc').textContent = wc + ' words';
+  state.slackWords = wc;
+}
+
+// ── MODULE 7: VALUES ────────────────────────────────────
+function updateWC(textId, wcId) {
+  const wc = countWords(document.getElementById(textId).value);
+  document.getElementById(wcId).textContent = wc + ' words';
+
+  const allText = [
+    document.getElementById('v1-text').value,
+    document.getElementById('v2-text').value,
+    document.getElementById('v3-text').value
+  ].join(' ').toLowerCase();
+
+  const signals = {
+    customer: ['user','customer','experience','churn','trust','ux','feel'],
+    business: ['cost','revenue','margin','$','shipping','deadline','business'],
+    craft: ['elegant','technical debt','refactor','clean','architecture','proper','correct'],
+    ops: ['rollback','monitor','observability','stability','incident','alert','uptime']
+  };
+
+  let totals = {customer:0,business:0,craft:0,ops:0};
+  Object.entries(signals).forEach(([k,words]) => {
+    totals[k] = words.filter(w => allText.includes(w)).length;
+  });
+
+  const max = Math.max(...Object.values(totals), 1);
+  Object.keys(totals).forEach(k => {
+    const pct = Math.min(100, (totals[k]/max)*100);
+    document.getElementById(`o-${k}`).style.width = pct + '%';
+    state.orientation[k] = pct;
+  });
+}
+
+// ── SCORING ─────────────────────────────────────────────
+function computeModuleScore(mod) {
+  let score = 0;
+  if (mod === 1) {
+    const n = state.components.length;
+    score += Math.min(30, n * 3);
+    if (state.components.includes('Rate Limiter')) score += 15;
+    if (state.components.includes('Monitoring')) score += 10;
+    if (state.components.includes('Circuit Breaker')) score += 10;
+    score += Math.min(35, state.tradeoffWords * 0.5);
+    state.moduleScores[0] = Math.round(Math.min(100, score));
+  }
+  if (mod === 2) {
+    const ecScore = state.ecAddressed.filter(Boolean).length * 15;
+    const aiScore = Math.min(20, state.aiInteractions * 3);
+    const specScore = state.aiPrompts.some(p => p.split(' ').length > 5) ? 15 : 5;
+    const codeLen = document.getElementById('debug-answer').value.length;
+    const codeScore = Math.min(20, codeLen * 0.05);
+    state.moduleScores[1] = Math.round(Math.min(100, ecScore + aiScore + specScore + codeScore + 10));
+  }
+  if (mod === 3) {
+    let s = 20;
+    s += state.toolsOpened.length * 8;
+    if (state.hypothesisWrittenBefore) s += 20;
+    const goodOrder = ['logs','metrics','deploys','traces'].every((t,i) => state.toolsOpened.indexOf(t) !== -1);
+    if (goodOrder) s += 15;
+    const hypText = document.getElementById('hypothesis-text').value.toLowerCase();
+    if (hypText.includes('deploy') || hypText.includes('payment-service')) s += 15;
+    state.moduleScores[2] = Math.round(Math.min(100, s));
+  }
+  if (mod === 4) {
+    const rubricMet = Object.values(state.emailRubric).filter(Boolean).length;
+    const emailScore = rubricMet * 10;
+    const memoWords = countWords(document.getElementById('memo-text').value);
+    const memoScore = Math.min(40, memoWords * 0.4);
+    state.moduleScores[3] = Math.round(Math.min(100, emailScore + memoScore + 10));
+  }
+  if (mod === 5) {
+    let s = 10;
+    s += Object.keys(state.docsVisited).length * 8;
+    if (state.retryFound) s += 20;
+    if (state.idempotencyFound) s += 15;
+    const implWords = countWords(document.getElementById('impl-text').value);
+    s += Math.min(20, implWords * 0.3);
+    state.moduleScores[4] = Math.round(Math.min(100, s));
+  }
+  if (mod === 6) {
+    const text = document.getElementById('slack-reply').value.toLowerCase();
+    let s = 10;
+    if (text.includes('jordan') || text.includes('redis') || text.includes('research')) s += 20;
+    if (text.includes('priya') || text.includes('checkout') || text.includes('6 week') || text.includes('launch')) s += 20;
+    if (text.includes('zookeeper') || text.includes('kraft') || text.includes('dependency') || text.includes('infra')) s += 20;
+    if (state.slackWords > 80) s += 15;
+    if (state.slackWords > 150) s += 10;
+    state.moduleScores[5] = Math.round(Math.min(100, s));
+  }
+  if (mod === 7) {
+    let s = 20;
+    s += Math.min(30, state.v1words * 0.4 + countWords(document.getElementById('v1-text')?.value||'') * 0.4);
+    s += Math.min(25, countWords(document.getElementById('v2-text').value) * 0.4);
+    const v3 = document.getElementById('v3-text').value.toLowerCase();
+    if (v3.includes('good point') || v3.includes('fair') || v3.includes('update') || v3.includes('reconsider')) s += 15;
+    if (v3.length > 100) s += 10;
+    state.moduleScores[6] = Math.round(Math.min(100, s));
+  }
+}
+
+function computeDimensions() {
+  const s = state.moduleScores;
+  const d = state.dimensions;
+  const norm = v => Math.round(v / 10);
+
+  d.customerOrientation = norm(s[3] * 0.4 + s[6] * 0.4 + (state.orientation.customer / 100) * 30);
+  d.businessAwareness = norm(s[6] * 0.5 + (state.orientation.business / 100) * 40 + s[0] * 0.2);
+  d.technicalCraft = norm(s[1] * 0.5 + s[0] * 0.3 + s[2] * 0.2);
+  d.operationalStability = norm(s[0] * 0.3 + s[2] * 0.4 + s[6] * 0.3);
+  d.intellectualHonesty = norm(s[6] * 0.5 + s[3] * 0.3 + s[4] * 0.2);
+  d.assumptionAwareness = norm(s[3] * 0.5 + s[6] * 0.3 + s[0] * 0.2);
+  d.comfortAmbiguity = norm(s[6] * 0.4 + s[2] * 0.3 + s[3] * 0.3);
+  d.communicationClarity = norm(s[3] * 0.6 + s[5] * 0.4);
+  d.structuredThinking = norm(s[2] * 0.4 + s[3] * 0.3 + s[0] * 0.3);
+  d.aiCollaborationMaturity = norm(s[1]);
+  d.intellectualOpenness = norm(s[6] * 0.6 + s[5] * 0.4);
+  d.collaborativeGenerosity = norm(s[5]);
+  d.stakeholderTranslation = norm(s[5] * 0.5 + s[3] * 0.5);
+
+  Object.keys(d).forEach(k => { d[k] = Math.min(10, Math.max(1, d[k])); });
+}
+
+function computeFitScore() {
+  let totalWeight = 0, weightedScore = 0;
+  Object.keys(IDEAL_PROFILE).forEach(k => {
+    const w = WEIGHT_VALUES[IDEAL_WEIGHTS[k]] || 1;
+    const ideal = IDEAL_PROFILE[k];
+    const actual = state.dimensions[k];
+    const gap = Math.abs(ideal - actual);
+    const score = Math.max(0, 1 - gap / ideal);
+    weightedScore += score * w;
+    totalWeight += w;
+  });
+  return Math.round((weightedScore / totalWeight) * 100);
+}
+
+// ── RESULTS ─────────────────────────────────────────────
+function showResults() {
+  computeModuleScore(7);
+  computeDimensions();
+
+  document.getElementById('assessment').style.display = 'none';
+  const rs = document.getElementById('results-screen');
+  rs.style.display = 'block';
+  window.scrollTo(0, 0);
+
+  const fit = computeFitScore();
+  document.getElementById('fit-score').textContent = fit + '%';
+
+  const badge = document.getElementById('verdict-badge');
+  if (fit >= 75) { badge.textContent = 'RECOMMEND: TECHNICAL INTERVIEW'; badge.className = 'verdict-badge recommend'; }
+  else if (fit >= 55) { badge.textContent = 'CONSIDER: FURTHER REVIEW'; badge.className = 'verdict-badge consider'; }
+  else { badge.textContent = 'PASS: SIGNIFICANT GAPS'; badge.className = 'verdict-badge pass'; }
+
+  // Module score cards
+  const names = ['System Design','Debugging with AI','Outage Investigation','Incident Comms','Feature Build from Docs','Collaborative Judgment','Values & Tradeoffs'];
+  const grid = document.getElementById('module-scores-grid');
+  grid.innerHTML = '';
+  state.moduleScores.forEach((score, i) => {
+    const color = score >= 75 ? '#c8f23a' : score >= 55 ? '#f59e0b' : '#ff4d4d';
+    const r = 18, circ = 2 * Math.PI * r;
+    const dash = (score / 100) * circ;
+    grid.innerHTML += `
+      <div class="module-score-card">
+        <div class="ms-score-ring">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="${r}" fill="none" stroke="#2a2a30" stroke-width="3"/>
+            <circle cx="22" cy="22" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+          </svg>
+          <div class="score-text" style="color:${color}">${score}</div>
+        </div>
+        <div class="ms-info">
+          <div class="ms-name">${names[i]}</div>
+          <div class="ms-signals">${getModuleSignalSummary(i, score)}</div>
+        </div>
+      </div>`;
+  });
+
+  // Dimension rows
+  const dimLabels = {
+    customerOrientation:'Customer Orientation', businessAwareness:'Business Awareness',
+    technicalCraft:'Technical Craft', operationalStability:'Operational Stability',
+    intellectualHonesty:'Intellectual Honesty', assumptionAwareness:'Assumption Awareness',
+    comfortAmbiguity:'Comfort w/ Ambiguity', communicationClarity:'Communication Clarity',
+    structuredThinking:'Structured Thinking', aiCollaborationMaturity:'AI Collaboration',
+    intellectualOpenness:'Intellectual Openness', collaborativeGenerosity:'Collaborative Generosity',
+    stakeholderTranslation:'Stakeholder Translation'
+  };
+
+  const dimRows = document.getElementById('dim-rows');
+  dimRows.innerHTML = '';
+  Object.keys(dimLabels).forEach(k => {
+    const actual = state.dimensions[k];
+    const ideal = IDEAL_PROFILE[k];
+    const gap = actual - ideal;
+    const gapStr = gap === 0 ? '±0' : (gap > 0 ? `+${gap}` : `${gap}`);
+    const gapClass = gap === 0 ? 'neutral' : (gap > 0 ? 'positive' : 'negative');
+    const fillPct = (actual / 10) * 100;
+    const targetPct = (ideal / 10) * 100;
+    dimRows.innerHTML += `
+      <div class="dim-row">
+        <div class="dim-name">${dimLabels[k]}</div>
+        <div class="dim-bar-wrap">
+          <div class="dim-bar-fill" style="width:${fillPct}%;background:${actual >= ideal ? 'var(--accent)' : 'var(--danger)'}"></div>
+          <div class="dim-bar-target" style="left:${targetPct}%"></div>
+        </div>
+        <div class="dim-scores">
+          <div class="candidate-score">${actual}/10</div>
+          <div class="gap ${gapClass}">${gapStr} vs ideal</div>
+        </div>
+      </div>`;
+  });
+
+  // Animate fills
+  setTimeout(() => {
+    document.querySelectorAll('.dim-bar-fill').forEach(el => {
+      const w = el.style.width; el.style.width = '0';
+      setTimeout(() => el.style.width = w, 50);
+    });
+  }, 100);
+}
+
+function getModuleSignalSummary(i, score) {
+  const summaries = [
+    `${state.components.length} components · ${state.tradeoffWords} tradeoff words`,
+    `${state.aiInteractions} AI interactions · ${state.ecAddressed.filter(Boolean).length}/4 edge cases`,
+    `${state.toolsOpened.length}/6 tools · ${state.hypothesisWrittenBefore ? 'hypothesis before' : 'no early hypothesis'}`,
+    `${Object.values(state.emailRubric).filter(Boolean).length}/5 rubric items`,
+    `${Object.keys(state.docsVisited).length}/6 docs · retry: ${state.retryFound ? '✓' : '—'}`,
+    `${state.slackWords} words · collaborative signals`,
+    `Orientation: ${topOrientation()}`
+  ];
+  return summaries[i] || '';
+}
+
+function topOrientation() {
+  const o = state.orientation;
+  const top = Object.entries(o).sort((a,b)=>b[1]-a[1])[0];
+  return top ? top[0] : 'mixed';
+}
+
+// ── UTILS ──────────────────────────────────────────────
+function countWords(text) {
+  return text.trim() ? text.trim().split(/\s+/).length : 0;
+}
+</script>
+</body>
+</html>
